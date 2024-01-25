@@ -18,7 +18,7 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   }, [savedBookIds]);
 
-  const [saveBook] = useMutation(SAVE_BOOK, {
+  const [saveBook, { error }] = useMutation(SAVE_BOOK, {
     update(cache, { data: { saveBook } }) {
       const { me } = cache.readQuery({
         query: GET_ME,
