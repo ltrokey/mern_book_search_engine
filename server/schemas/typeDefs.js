@@ -1,5 +1,5 @@
 const typeDefs = `
-    type: User {
+    type User {
         _id: ID
         username: String
         email: String
@@ -7,7 +7,7 @@ const typeDefs = `
         savedBooks: [Book]!
     }
 
-    type: Book {
+    type Book {
         bookId: ID
         authors: [String]
         description: String
@@ -42,4 +42,4 @@ const typeDefs = `
     }
 `;
 
-export default typeDefs;
+module.exports = typeDefs;

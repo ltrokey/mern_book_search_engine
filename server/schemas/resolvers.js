@@ -1,5 +1,5 @@
-import { User } from "../models";
-import { signToken, AuthenticationError } from "../utils/auth";
+const { User } = require("../models");
+const { signToken, AuthenticationError } = require("../utils/auth");
 
 const resolvers = {
   Query: {
@@ -92,4 +92,4 @@ const resolvers = {
   },
 };
 
-export default resolvers;
+module.exports = resolvers;
