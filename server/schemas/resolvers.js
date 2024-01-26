@@ -48,6 +48,7 @@ const resolvers = {
 
         const user = await User.create({ username, email, password });
         const token = signToken(user);
+        console.log("Sever Side Token", token);
 
         return { token, user };
       } catch (error) {
