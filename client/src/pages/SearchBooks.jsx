@@ -61,14 +61,15 @@ const SearchBooks = () => {
     }
 
     try {
-      const { data } = await saveBook({
-        variables: { bookInput: bookToSave },
+      const results = await saveBook({
+        variables: { input: bookToSave },
       });
 
-      setSavedBookIds([
-        ...savedBookIds,
-        data.saveBook.savedBooks[data.saveBook.savedBooks.length - 1].bookId,
-      ]);
+      if (!results) {
+        throw new Error("Something went wrong with saving this book.");
+      }
+
+      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
       console.error(err);
     }

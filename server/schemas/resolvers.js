@@ -5,7 +5,7 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        const userData = await User.findOne({ _id: context.user }).select(
+        const userData = await User.findOne({ _id: context.user_id }).select(
           "-__v -password"
         );
         return userData;
@@ -58,40 +58,27 @@ const resolvers = {
         return { error: error.message };
       }
     },
-    saveBook: async (parent, { bookInput }, context) => {
-      if (!context.user) {
-        throw new Error("Please login or signup to save a book");
-      }
-
-      try {
-        const updatedUserBooks = await User.findByIdAndUpdate(
+    saveBook: async (parent, { input }, context) => {
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { savedBooks: bookInput } },
-          { new: true }
-        ).populate("savedBooks");
-
-        return updatedUserBooks;
-      } catch (error) {
-        console.error(error);
-        throw new Error("☹️ Something went wrong saving this book.");
+          { $push: { savedBooks: input } },
+          { new: true, runValidators: true }
+        );
+        return updatedUser;
       }
+      throw new AuthenticationError("Please login to save this book.");
     },
     removeBook: async (parent, { bookId }, context) => {
-      if (!context.user) {
-        throw new Error("Please login or signup to remove a book");
-      }
-
-      try {
-        const updatedUserBooks = await User.findByIdAndUpdate(
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { savedBooks: { bookId } } },
+          { $pull: { savedBooks: { bookId: bookId } } },
           { new: true }
-        ).populate("savedBooks");
-
-        return updatedUserBooks;
-      } catch (error) {
-        throw new Error("☹️ Something went wrong removing this book.");
+        );
+        return updatedUser;
       }
+      throw new AuthenticationError("Please login to remove this book.");
     },
   },
 };
