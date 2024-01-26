@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
-import { GET_ME } from "../utils/queries";
 import { SAVE_BOOK } from "../utils/mutations";
 
 import { Container, Col, Form, Button, Card, Row } from "react-bootstrap";
@@ -18,26 +17,7 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   }, [savedBookIds]);
 
-  const [saveBook, { error }] = useMutation(SAVE_BOOK, {
-    update(cache, { data: { saveBook } }) {
-      const { me } = cache.readQuery({
-        query: GET_ME,
-      });
-
-      cache.writeQuery({
-        query: GET_ME,
-        data: {
-          me: {
-            ...me,
-            savedBooks: [
-              ...me.savedBooks,
-              saveBook.saveBook[saveBook.savedBooks.length - 1],
-            ],
-          },
-        },
-      });
-    },
-  });
+  const [saveBook] = useMutation(SAVE_BOOK);
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -76,6 +56,7 @@ const SearchBooks = () => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
     if (!token) {
+      console.log("User is not logged in");
       return false;
     }
 

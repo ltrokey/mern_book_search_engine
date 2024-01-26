@@ -11,7 +11,7 @@ module.exports = {
     },
   }),
 
-  authMiddleware: function ({ req, res }) {
+  authMiddleware: function ({ req }) {
     let token = req.body.token || req.query.token || req.headers.authorization;
 
     if (req.headers.authorization) {
@@ -19,7 +19,6 @@ module.exports = {
     }
 
     if (!token) {
-      // return res.status(400).json({ message: "You have no token!" });
       return req;
     }
 
@@ -28,10 +27,7 @@ module.exports = {
       req.user = data;
     } catch {
       console.log("Invalid token");
-      // return res.status(400).json({ message: "invalid token!" });
     }
-
-    // next();
   },
   signToken: function ({ username, email, _id }) {
     const payload = { username, email, _id };

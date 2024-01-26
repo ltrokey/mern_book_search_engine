@@ -5,7 +5,10 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        return User.findOne({ _id: context.user._id }).populate("savedBooks");
+        const userData = await User.findOne({ _id: context.user }).select(
+          "-__v -password"
+        );
+        return userData;
       }
 
       throw new AuthenticationError("Oops, user not logged in");
@@ -62,8 +65,8 @@ const resolvers = {
 
       try {
         const updatedUserBooks = await User.findByIdAndUpdate(
-          context.user._id,
-          { $push: { savedBooks: bookInput } },
+          { _id: context.user._id },
+          { $addToSet: { savedBooks: bookInput } },
           { new: true }
         ).populate("savedBooks");
 
@@ -80,7 +83,7 @@ const resolvers = {
 
       try {
         const updatedUserBooks = await User.findByIdAndUpdate(
-          context.user._id,
+          { _id: context.user._id },
           { $pull: { savedBooks: { bookId } } },
           { new: true }
         ).populate("savedBooks");
