@@ -11,7 +11,7 @@ const resolvers = {
         return userData;
       }
 
-      throw new AuthenticationError("Oops, user not logged in");
+      throw AuthenticationError;
     },
   },
 
@@ -20,17 +20,13 @@ const resolvers = {
       const user = await User.findOne({ email });
 
       if (!user) {
-        throw new AuthenticationError(
-          "Invalid email or password. Please try again."
-        );
+        throw AuthenticationError;
       }
 
       const isPasswordValid = await user.isCorrectPassword(password);
 
       if (!isPasswordValid) {
-        throw new AuthenticationError(
-          "Invalid email or password. Please try again."
-        );
+        throw AuthenticationError;
       }
 
       const token = signToken(user);
@@ -58,16 +54,17 @@ const resolvers = {
         return { error: error.message };
       }
     },
-    saveBook: async (parent, { input }, context) => {
+    saveBook: async (parent, { bookData }, context) => {
+      console.log("Save Book Content User", context.user);
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $push: { savedBooks: input } },
+          { $push: { savedBooks: bookData } },
           { new: true, runValidators: true }
         );
         return updatedUser;
       }
-      throw new AuthenticationError("Please login to save this book.");
+      throw AuthenticationError;
     },
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
@@ -78,7 +75,7 @@ const resolvers = {
         );
         return updatedUser;
       }
-      throw new AuthenticationError("Please login to remove this book.");
+      throw AuthenticationError;
     },
   },
 };

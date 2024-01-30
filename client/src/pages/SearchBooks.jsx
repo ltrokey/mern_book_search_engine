@@ -55,17 +55,20 @@ const SearchBooks = () => {
 
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
+    console.log("Book Id", bookId);
+    console.log("Token", token);
+
     if (!token) {
       console.log("User is not logged in");
       return false;
     }
 
     try {
-      const results = await saveBook({
-        variables: { input: bookToSave },
+      const { data } = await saveBook({
+        variables: { bookData: { ...bookToSave } },
       });
 
-      if (!results) {
+      if (!data) {
         throw new Error("Something went wrong with saving this book.");
       }
 
