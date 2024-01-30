@@ -4,11 +4,15 @@ const { signToken, AuthenticationError } = require("../utils/auth");
 const resolvers = {
   Query: {
     me: async (parent, args, context) => {
+      console.log("Me Query", context.user);
       if (context.user) {
-        return User.findOne({ _id: context.user._id }).populate("savedBooks");
+        const userData = await User.findOne({ _id: context.user._id }).select(
+          "-__v -password"
+        );
+        return userData;
       }
 
-      throw new AuthenticationError("Oops, user not logged in");
+      throw AuthenticationError;
     },
   },
 
@@ -17,20 +21,19 @@ const resolvers = {
       const user = await User.findOne({ email });
 
       if (!user) {
-        throw new AuthenticationError(
-          "Invalid email or password. Please try again."
-        );
+        throw AuthenticationError;
       }
 
       const isPasswordValid = await user.isCorrectPassword(password);
 
       if (!isPasswordValid) {
-        throw new AuthenticationError(
-          "Invalid email or password. Please try again."
-        );
+        throw AuthenticationError;
       }
 
       const token = signToken(user);
+
+      console.log("login token", token);
+      console.log("login user", user);
 
       return { token, user };
     },
@@ -55,40 +58,30 @@ const resolvers = {
         return { error: error.message };
       }
     },
-    saveBook: async (parent, { bookInput }, context) => {
-      if (!context.user) {
-        throw new Error("Please login or signup to save a book");
+    saveBook: async (parent, { bookData }, context) => {
+      console.log("book data", bookData);
+      console.log("Context", context);
+      console.log("Save Book Content User", context.user);
+      if (context.user) {
+        const updatedUser = await User.findByIdAndUpdate(
+          { _id: context.user._id },
+          { $push: { savedBooks: bookData } },
+          { new: true, runValidators: true }
+        );
+        return updatedUser;
       }
-
-      try {
-        const updatedUserBooks = await User.findByIdAndUpdate(
-          context.user._id,
-          { $push: { savedBooks: bookInput } },
-          { new: true }
-        ).populate("savedBooks");
-
-        return updatedUserBooks;
-      } catch (error) {
-        console.error(error);
-        throw new Error("☹️ Something went wrong saving this book.");
-      }
+      throw AuthenticationError;
     },
     removeBook: async (parent, { bookId }, context) => {
-      if (!context.user) {
-        throw new Error("Please login or signup to remove a book");
-      }
-
-      try {
-        const updatedUserBooks = await User.findByIdAndUpdate(
-          context.user._id,
-          { $pull: { savedBooks: { bookId } } },
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $pull: { savedBooks: { bookId: bookId } } },
           { new: true }
-        ).populate("savedBooks");
-
-        return updatedUserBooks;
-      } catch (error) {
-        throw new Error("☹️ Something went wrong removing this book.");
+        );
+        return updatedUser;
       }
+      throw AuthenticationError;
     },
   },
 };

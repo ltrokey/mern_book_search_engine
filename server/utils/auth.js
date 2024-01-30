@@ -11,31 +11,29 @@ module.exports = {
     },
   }),
 
-  authMiddleware: function ({ req, res }) {
+  authMiddleware: function ({ req }) {
     let token = req.body.token || req.query.token || req.headers.authorization;
+
+    console.log("Auth Token", token);
 
     if (req.headers.authorization) {
       token = token.split(" ").pop().trim();
     }
 
     if (!token) {
-      // return res.status(400).json({ message: "You have no token!" });
       return req;
     }
 
     try {
       const { data } = jwt.verify(token, secret, { maxAge: expiration });
       req.user = data;
+      console.log("Decoded User Data:", data);
     } catch {
       console.log("Invalid token");
-      // return res.status(400).json({ message: "invalid token!" });
     }
-
-    // next();
   },
   signToken: function ({ username, email, _id }) {
     const payload = { username, email, _id };
-
     return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
   },
 };
