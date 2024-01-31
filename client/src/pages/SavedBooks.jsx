@@ -14,20 +14,15 @@ const SavedBooks = () => {
   const [removeBook] = useMutation(REMOVE_BOOK);
 
   const handleDeleteBook = async (bookId) => {
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-    if (!token) {
-      return false;
-    }
-
     try {
       await removeBook({
-        variables: { bookId: bookId },
+        variables: { bookId },
+        refetchQueries: [{ query: GET_ME }],
       });
 
       removeBookId(bookId);
     } catch (error) {
-      console.error(error);
+      console.error("Delete book error:", error.message || error);
     }
   };
 
