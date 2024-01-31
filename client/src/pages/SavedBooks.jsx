@@ -39,7 +39,7 @@ const SavedBooks = () => {
     <>
       <div className="text-light bg-dark p-5">
         <Container>
-          <h1>Viewing {userData.username} saved books!</h1>
+          <h1>Viewing {userData.username}'s saved books!</h1>
         </Container>
       </div>
       <Container>
@@ -53,8 +53,8 @@ const SavedBooks = () => {
         <Row>
           {userData.savedBooks?.map((book) => {
             return (
-              <Col md="4">
-                <Card key={book.bookId} border="dark">
+              <Col key={book.bookId} md="4">
+                <Card border="dark">
                   {book.image ? (
                     <Card.Img
                       src={book.image}
