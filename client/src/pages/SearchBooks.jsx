@@ -17,7 +17,7 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   }, [savedBookIds]);
 
-  const [saveBook, { err }] = useMutation(SAVE_BOOK);
+  const [saveBook] = useMutation(SAVE_BOOK);
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -55,9 +55,6 @@ const SearchBooks = () => {
 
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
-    console.log("Book Id", bookId);
-    console.log("Token", token);
-
     if (!token) {
       console.log("User is not logged in");
       return false;
@@ -67,8 +64,6 @@ const SearchBooks = () => {
       const { data } = await saveBook({
         variables: { bookData: { ...bookToSave } },
       });
-
-      console.log("book data", data);
 
       if (!data) {
         throw new Error("Something went wrong with saving this book.");
